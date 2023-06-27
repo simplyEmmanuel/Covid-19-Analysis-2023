@@ -75,5 +75,16 @@ WHERE continent IS NOT NULL
 ORDER BY total_cases, total_deaths
 
 
--- Looking at the Covid Vaccinations table
+-- Combining the two tables to look at the Total Population vs Vaccinations
+  
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(cast(vac.new_vaccinations as bigint)) OVER (Partition by dea.location Order by dea.location, 
+dea.date) as RollingPeopleVaccinated
+FROM Portfolio..CovidDeaths dea
+JOIN Portfolio..CovidVaccinations vac
+	ON dea.location = vac.location
+	AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+ORDER BY 2,3
+
 
