@@ -100,3 +100,62 @@ WHERE dea.continent IS NOT NULL
 ORDER BY 2,3
 
 
+-- To obtain the Max. Number of RollingPeopleVaccinated 
+-- by the Population to know how many people are vaccinated
+
+-- CTE for Population vs Vaccinations
+With PopvsVac (continent, location, date, population, new_vaccinations, RollingPeopleVaccinated)
+as
+(
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(cast(vac.new_vaccinations as bigint)) OVER (Partition by dea.location Order by dea.location, 
+dea.date) as RollingPeopleVaccinated
+FROM Portfolio..CovidDeaths dea
+JOIN Portfolio..CovidVaccinations vac
+	ON dea.location = vac.location
+	AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
+)
+SELECT *, (RollingPeopleVaccinated/population)*100 as PercentVaccinated
+FROM PopvsVac
+
+
+
+-- TEMP TABLE
+
+DROP TABLE If exists #PercentPopulationVaccinated
+CREATE TABLE #PercentPopulationVaccinated
+(
+Continent nvarchar(255),
+Location nvarchar(255),
+Date datetime,
+Population numeric,
+New_vaccinations numeric,
+RollingPeopleVaccinated numeric
+)
+
+INSERT INTO #PercentPopulationVaccinated
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(cast(vac.new_vaccinations as bigint)) OVER (Partition by dea.location Order by dea.location, 
+dea.date) as RollingPeopleVaccinated
+FROM Portfolio..CovidDeaths dea
+JOIN Portfolio..CovidVaccinations vac
+	ON dea.location = vac.location
+	AND dea.date = vac.date
+--WHERE dea.continent IS NOT NULL
+
+SELECT *, (RollingPeopleVaccinated/population)*100 as PercentVaccinated
+FROM #PercentPopulationVaccinated
+
+
+-- Let's create View to store data for later
+
+Create View PercentPopulatedVaccinated as
+SELECT dea.continent, dea.location, dea.date, dea.population, vac.new_vaccinations
+, SUM(cast(vac.new_vaccinations as bigint)) OVER (Partition by dea.location Order by dea.location, 
+dea.date) as RollingPeopleVaccinated
+FROM Portfolio..CovidDeaths dea
+JOIN Portfolio..CovidVaccinations vac
+	ON dea.location = vac.location
+	AND dea.date = vac.date
+WHERE dea.continent IS NOT NULL
