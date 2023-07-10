@@ -24,6 +24,7 @@ The objective of this documentation is to provide a comprehensive and informativ
 The Coronavirus Covid-19 (Deaths) data collected from [here](https://ourworldindata.org/covid-deaths) contains 320,000+ observations of various countries across the different continents. The data spans from January 2020 to June 2023 highlighting the number of death cases, administered vaccines, and human development index amongst other variables.  
 
 ![](data_source.png)
+
 ##
 
 To select your preferred country and data range, simply scroll down to the data explorer as depicted in the image below. This data may have been updated from the time of this report. 
